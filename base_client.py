@@ -85,9 +85,8 @@ class Client(UserClient):
 
     # Heuristic Functions
     def road_h(self, r):
-        speed = 55
-        safetyPenalty = {0: 0, 1: 0.25, 2: 0.15, 3: 0.15, 4: 0, 5: -0.15, 6: -0.25}
-        timeToPass = r.length / speed
+        safetyPenalty = {0: 0, 1: 0.1429, 2: 0.1429, 3: 0.0426, 4: 0.4799, 5: 0.5461, 6: 0.5461}
+        timeToPass = (r.length / 55.0) + (r.length / 121.491598) + 2.2380361
         return timeToPass + safetyPenalty[r.road_type]
 
     def generateRoadMap(self, truck):
@@ -110,4 +109,5 @@ class Client(UserClient):
             temp = temp.next_node
 
         return roadMap
+
 
