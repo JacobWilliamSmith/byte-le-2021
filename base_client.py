@@ -48,7 +48,10 @@ class Client(UserClient):
             road = self.select_new_route(actions, truck)
             # print("Move:")
             actions.set_action(ActionType.select_route, road)
+<<<<<<< HEAD
             self.generateRoadMap(truck)
+=======
+>>>>>>> 8efee8feb42090e2ebea50ffa3333440b868420c
         
         pass
 
