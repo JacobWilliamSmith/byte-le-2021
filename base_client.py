@@ -45,12 +45,10 @@ class Client(UserClient):
         elif(truck.active_contract.game_map.current_node.next_node is not None):
             # Move to next node
             # Road can be selected by passing the index or road object
-            #print("Move")
             road = self.select_new_route(actions, truck)
+            # print("Move:")
             actions.set_action(ActionType.select_route, road)
-
-        if self.turn == 69 or self.turn == 420:
-            print("Funny Number! " + truck.__str__())
+            self.generateRoadMap(truck)
         
         pass
 
@@ -78,3 +76,48 @@ class Client(UserClient):
     def select_new_route(self, actions, truck):
         roads = truck.active_contract.game_map.current_node.roads
         return roads[0]
+
+    # Heuristic Functions
+    def road_h(self, r):
+        speed = 55
+        safetyPenalty = {0: 0, 1: 0.25, 2: 0.15, 3: 0.15, 4: 0, 5: -0.15, 6: -0.25}
+        timeToPass = r.length / speed
+        return timeToPass + safetyPenalty[r.road_type]
+
+    def generateRoadMap(self, truck):
+        temp = truck.active_contract.game_map.current_node
+        numNodes = 0
+
+        while(temp is not None):
+            numNodes += 1
+            temp = temp.next_node
+
+        roadMap = [0 for i in range(numNodes)]
+        temp = truck.active_contract.game_map.current_node
+
+        for i in range(numNodes):
+            optRoad = 0
+            for j in range(len(temp.roads)):
+                if self.road_h(temp.roads[optRoad]) > self.road_h(temp.roads[j]):
+                    optRoad = j
+            roadMap[i] = optRoad
+            temp = temp.next_node
+            print(roadMap[i])
+
+        return roadMap
+
+
+    def contract_h(self, turn, actions, world, truck, time):
+        return
+    def upgrade_h(self, turn, actions, world, truck, time):
+        return
+    def gas_h(self, turn, actions, world, truck, time):
+        return
+    def repair_h(self, turn, actions, world, truck, time):
+        return
+
+    def jumpsToGas(self, truck):
+        
+
+    def jumpsToRepair(self, truck):
+
