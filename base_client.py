@@ -24,6 +24,9 @@ class Client(UserClient):
         :param world:       Generic world information
         """
         self.turn += 1
+        roads = []
+        if(truck.active_contract is not None):
+            roads = self.generateRoadMap(truck)
 
         chosen_upgrade = self.select_upgrade(actions, truck)
         # If there is not an active contract get one
@@ -45,13 +48,8 @@ class Client(UserClient):
         elif(truck.active_contract.game_map.current_node.next_node is not None):
             # Move to next node
             # Road can be selected by passing the index or road object
-            road = self.select_new_route(actions, truck)
             # print("Move:")
-            actions.set_action(ActionType.select_route, road)
-<<<<<<< HEAD
-            self.generateRoadMap(truck)
-=======
->>>>>>> 8efee8feb42090e2ebea50ffa3333440b868420c
+            actions.set_action(ActionType.select_route, roads.pop(0))
         
         pass
 
@@ -78,7 +76,12 @@ class Client(UserClient):
     # Road can be selected by passing the index or road object
     def select_new_route(self, actions, truck):
         roads = truck.active_contract.game_map.current_node.roads
-        return roads[0]
+        preference = 10
+        for road in roads:
+            temp = self.road_h(road)
+            if temp < preference:
+                best_road = road
+        return road
 
     # Heuristic Functions
     def road_h(self, r):
@@ -105,22 +108,6 @@ class Client(UserClient):
                     optRoad = j
             roadMap[i] = optRoad
             temp = temp.next_node
-            print(roadMap[i])
 
         return roadMap
-
-
-    def contract_h(self, turn, actions, world, truck, time):
-        return
-    def upgrade_h(self, turn, actions, world, truck, time):
-        return
-    def gas_h(self, turn, actions, world, truck, time):
-        return
-    def repair_h(self, turn, actions, world, truck, time):
-        return
-
-    def jumpsToGas(self, truck):
-        
-
-    def jumpsToRepair(self, truck):
 
