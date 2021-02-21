@@ -24,18 +24,15 @@ class Client(UserClient):
         :param world:       Generic world information
         """
         self.turn += 1
-        roads = []
-        if(truck.active_contract is not None):
-            roads = self.generateRoadMap(truck)
 
         chosen_upgrade = self.select_upgrade(actions, truck)
 
-        if(truck.active_contract is None):
+        
             # Get active contract
             # Set fuel sunk costs to 0
             # Set repair sunk costs to 0
-
-        else:
+            print("")
+        elif:
             # piggyBank = money on hand - (fuel sunk costs + repair sunk costs + 2 * (fuel remaining costs + repair remaining costs))
             
             # If(Don't have good tires and piggybank affords good tires)
@@ -76,16 +73,72 @@ class Client(UserClient):
         #     # Road can be selected by passing the index or road object
         #     # print("Move:")
         #     actions.set_action(ActionType.select_route, roads.pop(0))
-        
-        # pass
 
+        # pass
+        print("")
     # These methods are not necessary, so feel free to modify or replace
     def select_new_contract(self, actions, truck):
-        selected_contract = truck.contract_list[0]
+        pay, cost, time, roadmap, expVal = 0, best
         for contract in truck.contract_list:
-            if contract.difficulty == ContractDifficulty.easy:
-                selected_contract = contract
-        return selected_contract
+            try:
+                if contract.level == 0:
+                    pass
+            except AttributeError as e:
+                pass
+            roadmap = self.generate_roadMap(contract)
+            pay = contract.money_reward
+            cost = self.calculate_cost(contract, truck, roadmap) * contract.difficulty
+            time = calculate_time(contract, roadmap)
+            if((pay - cost) / time) > expVal:
+                expVal = (pay - cost) / time
+                best = contract
+        if best != None:
+            return best
+
+        for contract in truck.contract_list:
+            roadmap = self.generate_roadMap(contract)
+            pay = contract.money_reward
+            cost = self.calculate_cost(contract, truck, roadmap) * contract.difficulty
+            time = calculate_time(contract, roadmap)
+            if((pay - cost) / time) > expVal:
+                expVal = (pay - cost) / time
+                best = contract
+
+        return best
+
+    #calculates time to completion
+    def calculate_time(self, contract, roadmap):
+        time, temp = contract.game_map.head
+        for i in range(len(roadmap)):
+            time += self.road_h(temp.roads[roadmap[i]])
+            temp = temp.next_node
+        return time
+
+    #calculates the cost for a contract
+    def calculate_cost(self, contract, truck, roadmap):
+        current_fuel = truck.body.gas, cost = 0
+        temp = contract.game_map.head
+        expected_damage = 0.0
+        repair_rate_sum = 0.0
+
+        for jump in roadmap:
+            fuel_used = temp.roads[jump].length / 6.0746
+            if (current_fuel - fuel_used <= 0):
+                cost += temp.gas_price*(1-current_fuel)*100
+                current_fuel = truck.max_gas
+            current_fuel -= fuel_used
+            expected_damage += 15 # adjust this later
+            repair_rate_sum = temp.repair_price
+            temp = temp.next_node
+        
+        repair_rate_avg = repair_rate_sum / len(roadmap)
+        repair_cost = expected_damage * repair_rate_avg
+        
+        cost += repair_cost
+        
+        return cost
+            
+
 
     # Contract can be selected by passing the index or contract object
     def select_upgrade(self, actions, truck):
@@ -115,8 +168,8 @@ class Client(UserClient):
         timeToPass = (r.length / 55.0) + (r.length / 121.491598) + 2.2380361
         return timeToPass + safetyPenalty[r.road_type]
 
-    def generateRoadMap(self, truck):
-        temp = truck.active_contract.game_map.current_node
+    def generate_roadMap(self, contract):
+        temp = contract.game_map.current_node
         numNodes = 0
 
         while(temp is not None):
@@ -124,7 +177,7 @@ class Client(UserClient):
             temp = temp.next_node
 
         roadMap = [0 for i in range(numNodes)]
-        temp = truck.active_contract.game_map.current_node
+        temp = contract.game_map.current_node
 
         for i in range(numNodes):
             optRoad = 0
