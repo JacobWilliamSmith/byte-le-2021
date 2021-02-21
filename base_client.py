@@ -34,6 +34,8 @@ class Client(UserClient):
             #print("Select")
             chosen_contract = self.select_new_contract(actions, truck)
             actions.set_action(ActionType.select_contract, chosen_contract)
+        elif(truck.body.TireType != 1):
+            self.select_new_tires(actions, truck, "tire_econ")
         # Buy gas if below 20% and there is enough money to fill tank to full at max gas price
         elif(truck.body.current_gas < .20 and truck.money > 100*truck.active_contract.game_map.current_node.gas_price):
             #print("Gas")
@@ -57,9 +59,18 @@ class Client(UserClient):
     def select_new_contract(self, actions, truck):
         selected_contract = truck.contract_list[0]
         for contract in truck.contract_list:
-            if contract.difficulty == ContractDifficulty.easy:
-                selected_contract = contract
+            try:
+                if(contract.level == 0 ):
+                    print("illegal contact")
+            except AttributeError as e:
+                print("legal contract")
+                if(contract.difficulty == "easy"):
+                    selected_contract = contract
         return selected_contract
+
+    def select_new_tires(self, actions, truck, tireType):
+        print("switched tires")
+        actions.set_action(ActionType.change_tires, TireType.tireType)
 
     # Contract can be selected by passing the index or contract object
     def select_upgrade(self, actions, truck):
@@ -73,15 +84,6 @@ class Client(UserClient):
             chosen_upgrade = None
         return chosen_upgrade
     
-    # Road can be selected by passing the index or road object
-    def select_new_route(self, actions, truck):
-        roads = truck.active_contract.game_map.current_node.roads
-        preference = 10
-        for road in roads:
-            temp = self.road_h(road)
-            if temp < preference:
-                best_road = road
-        return road
 
     # Heuristic Functions
     def road_h(self, r):
@@ -109,5 +111,3 @@ class Client(UserClient):
             temp = temp.next_node
 
         return roadMap
-
-
