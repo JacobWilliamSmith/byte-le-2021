@@ -34,17 +34,37 @@ class Client(UserClient):
             print("")
         elif:
             # piggyBank = money on hand - (fuel sunk costs + repair sunk costs + 2 * (fuel remaining costs + repair remaining costs))
+        # If there is not an active contract get one
+        if(truck.active_contract is None):
+         # Get active contract
+            # Set fuel sunk costs to 0
+            # Set repair sunk costs to 0
+
+        else:
+            # variable to track money for upgrades
+            # piggyBank = truck.money - (fuel sunk costs + repair sunk costs + 2 * ((avg * (fuel remaining)) + repair remaining costs))
+
+            #check if tires are upgraded
+            # if(TireType != "tire_econ" and piggybank >= 300):
+            #     actions.set_action(ActionType.change_tires, TireType.tire_econ)change_tires
             
-            # If(Don't have good tires and piggybank affords good tires)
-                # Buy good tires
-            # Elif(RF is not max level & Can afford to upgrade RF & Level of RF <= Level of FT)
-                # Upgrade Rabbits Foot
-            # Elif(FT is not max level & Can afford to upgrade FT)
-                # Upgrade Fuel Tank
-            # Elif(Need gas to survive next jump & Money on hand > 0)
-                # Buy Fuel
-            # Elif(Need repair to survive next jump worst case scenario & Money on hand > 0)
-                # Buy Repair
+            #upgrades rabbit's foot if the level is less than or equal to the tank level and there is piggybank money for it
+            # Elif(truck.addons.level < 3 and truck.get_cost_of_upgrade(target_addons_upgrade) < piggybank and truck.addons.level <= truck.body.level)
+                #actions.set_action(ActionType.upgrade, ObjectType.rabbitFoot)
+            
+            #upgrades fuel tank if there is piggy bank money for it
+            # Elif(truck.body.level < 3 and truck.get_cost_of_upgrade(target_body_upgrade) < piggybank)
+                #actions.set_action(ActionType.upgrade, ObjectType.tank)
+
+            # checks if gas is necessary
+            # Elif(need gas to survive and truck.money > 0)
+                # actions.set_action(ActionType.buy_gas)
+            
+            #checks if repair is necessary
+            # Elif(if truck.health <= 48 and truck.money > 0)
+                # actions.set_action(ActionType.repair)
+            
+            #drives
             # Else:
                 # Drive on optimal road
 
@@ -188,5 +208,3 @@ class Client(UserClient):
             temp = temp.next_node
 
         return roadMap
-
-
