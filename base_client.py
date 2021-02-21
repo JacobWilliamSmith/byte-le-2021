@@ -34,8 +34,8 @@ class Client(UserClient):
             #print("Select")
             chosen_contract = self.select_new_contract(actions, truck)
             actions.set_action(ActionType.select_contract, chosen_contract)
-        elif(truck.body.TireType != 1):
-            self.select_new_tires(actions, truck, "tire_econ")
+        # elif(truck.body.TireType != 1):
+        #     self.select_new_tires(actions, truck, "tire_econ")
         # Buy gas if below 20% and there is enough money to fill tank to full at max gas price
         elif(truck.body.current_gas < .20 and truck.money > 100*truck.active_contract.game_map.current_node.gas_price):
             #print("Gas")
@@ -63,7 +63,7 @@ class Client(UserClient):
                 if(contract.level == 0 ):
                     print("illegal contact")
             except AttributeError as e:
-                print("legal contract")
+                # print("legal contract")
                 if(contract.difficulty == "easy"):
                     selected_contract = contract
         return selected_contract
