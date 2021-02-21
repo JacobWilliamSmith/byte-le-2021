@@ -20,22 +20,23 @@ class Client(UserClient):
         self.turn += 1
 
 
-<<<<<<< HEAD
-=======
         
         # Get active contract
         # Set fuel sunk costs to 0
         # Set repair sunk costs to 0
         
         # If there is not an active contract get one
->>>>>>> ad5d7c5c68c3416c75ba2692a0543f620c0ff12b
         if(truck.active_contract is None):
             chosen_contract = self.select_new_contract(actions, truck)
             actions.set_action(ActionType.select_contract, chosen_contract)
         else:
             piggyBank = truck.money - self.calculate_cost(truck.active_contract, truck, self.generate_roadMap(truck.active_contract))
 
-            if 0: # TODO: Buy upgrades here
+            if 0: 
+            
+            elif(truck.money > 300 and truck.tires != 1):
+	        print(truck.tires)
+	        actions.set_action(ActionType.change_tires, TireType.tire_econ)
 
             elif(truck.active_contract.game_map.current_node.next_node is not None):
                 print("Move:")
@@ -88,37 +89,7 @@ class Client(UserClient):
 
 
 
-<<<<<<< HEAD
-
-
-        # # If there is not an active contract get one
-        # if(truck.active_contract is None):
-        #     #print("Select")
-        #     chosen_contract = self.select_new_contract(actions, truck)
-        #     actions.set_action(ActionType.select_contract, chosen_contract)
-        # # Buy gas if below 20% and there is enough money to fill tank to full at max gas price
-        # elif(truck.body.current_gas < .20 and truck.money > 100*truck.active_contract.game_map.current_node.gas_price):
-        #     #print("Gas")
-        #     actions.set_action(ActionType.buy_gas)
-        # # If health is below max and have enough money to fully repair do so
-        # elif truck.health < 100 and truck.money > 1000:
-        #     #print("Heal")
-        #     actions.set_action(ActionType.repair)
-        # elif chosen_upgrade is not None:
-        #     #print("Upgrade")
-        #     actions.set_action(ActionType.upgrade, chosen_upgrade)
-        # elif(truck.active_contract.game_map.current_node.next_node is not None):
-        #     # Move to next node
-        #     # Road can be selected by passing the index or road object
-        #     # print("Move:")
-        #     actions.set_action(ActionType.select_route, roads.pop(0))
-
-        # pass
-        
-
-=======
     # These methods are not necessary, so feel free to modify or replace
->>>>>>> ad5d7c5c68c3416c75ba2692a0543f620c0ff12b
     def select_new_contract(self, actions, truck):
         pay, cost, time, roadmap, expVal = 0, best
         for contract in truck.contract_list:
