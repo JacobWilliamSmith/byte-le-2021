@@ -35,8 +35,8 @@ class Client(UserClient):
             if 0: 
             
             elif(truck.money > 300 and truck.tires != 1):
-	        print(truck.tires)
-	        actions.set_action(ActionType.change_tires, TireType.tire_econ)
+	            print(truck.tires)
+	            actions.set_action(ActionType.change_tires, TireType.tire_econ)
 
             elif(truck.active_contract.game_map.current_node.next_node is not None):
                 print("Move:")
