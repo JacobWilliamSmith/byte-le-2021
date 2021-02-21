@@ -17,30 +17,40 @@ class Client(UserClient):
 
     # This is where your AI will decide what to do
     def take_turn(self, turn, actions, world, truck, time):
-        """
-        This is where your AI will decide what to do.
-        :param turn:        The current turn of the game.
-        :param actions:     This is the actions object that you will add effort allocations or decrees to.
-        :param world:       Generic world information
-        """
         self.turn += 1
 
         chosen_upgrade = self.select_upgrade(actions, truck)
 
-        
-            # Get active contract
-            # Set fuel sunk costs to 0
-            # Set repair sunk costs to 0
-            print("")
-        elif:
-            # piggyBank = money on hand - (fuel sunk costs + repair sunk costs + 2 * (fuel remaining costs + repair remaining costs))
-        # If there is not an active contract get one
         if(truck.active_contract is None):
-         # Get active contract
-            # Set fuel sunk costs to 0
-            # Set repair sunk costs to 0
-
+            chosen_contract = self.select_new_contract(actions, truck)
+            actions.set_action(ActionType.select_contract, chosen_contract)
         else:
+            piggyBank = truck.money - self.calculate_cost(truck.active_contract, truck, self.generate_roadMap(truck.active_contract))
+
+            if 0: # TODO: Buy upgrades here
+
+            elif(truck.active_contract.game_map.current_node.next_node is not None):
+                print("Move:")
+                optRoad = 0
+
+                for i in range(len(temp.roads)):
+                    if self.road_h(temp.roads[optRoad]) > self.road_h(temp.roads[i]):
+                        optRoad = i
+
+                r = roads[optRoad]
+                fuel_used = r.length / 6.0746
+                worstCaseHPLoss = {0: 0, 1: 34.28, 2: 34.28, 3: 31.16, 4: 48, 5: 20.51, 6: 20.51}
+                hp_used = worstCaseHPLoss[r.road_type] # Todo: Deduct rabbit foot protection
+
+                if current_fuel - fuel_used <= 0 and truck.money > 0:
+                    actions.set_action(ActionType.buy_gas)
+                elif truck.health - hp_used <= 0 and truck.money > 0:
+                    actions.set_action(ActionType.repair)
+                else:
+                    actions.set_action(ActionType.select_route, r)
+
+        pass
+
             # variable to track money for upgrades
             # piggyBank = truck.money - (fuel sunk costs + repair sunk costs + 2 * ((avg * (fuel remaining)) + repair remaining costs))
 
@@ -95,8 +105,8 @@ class Client(UserClient):
         #     actions.set_action(ActionType.select_route, roads.pop(0))
 
         # pass
-        print("")
-    # These methods are not necessary, so feel free to modify or replace
+        
+
     def select_new_contract(self, actions, truck):
         pay, cost, time, roadmap, expVal = 0, best
         for contract in truck.contract_list:
