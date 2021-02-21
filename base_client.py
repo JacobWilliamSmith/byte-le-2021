@@ -18,12 +18,6 @@ class Client(UserClient):
 
     # This is where your AI will decide what to do
     def take_turn(self, turn, actions, world, truck, time):
-        """
-        This is where your AI will decide what to do.
-        :param turn:        The current turn of the game.
-        :param actions:     This is the actions object that you will add effort allocations or decrees to.
-        :param world:       Generic world information
-        """
         self.turn += 1
         chosen_upgrade = self.select_upgrade(actions, truck)
 
@@ -111,18 +105,6 @@ class Client(UserClient):
             
 
 
-    # Contract can be selected by passing the index or contract object
-    def select_upgrade(self, actions, truck):
-        target_body_upgrade = ObjectType.tank
-        target_addons_upgrade = ObjectType.rabbitFoot
-        if truck.body.level < 3 and truck.get_cost_of_upgrade(target_body_upgrade) < truck.money:
-            chosen_upgrade = target_body_upgrade
-        elif truck.addons.level < 3 and truck.get_cost_of_upgrade(target_addons_upgrade) < truck.money:
-            chosen_upgrade = target_addons_upgrade
-        else:
-            chosen_upgrade = None
-        return chosen_upgrade
-    
     # Road can be selected by passing the index or road object
     def select_new_route(self, actions, truck):
         roads = truck.active_contract.game_map.current_node.roads
