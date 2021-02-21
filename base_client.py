@@ -7,13 +7,14 @@ class Client(UserClient):
     def __init__(self):
         super().__init__()
         self.turn = 0
+        self.roads = []
 
     def team_name(self):
         """
         Allows the team to set a team name.
         :return: Your team name
         """
-        return 'Team Name'
+        return 'piston_cup_champions'
 
     # This is where your AI will decide what to do
     def take_turn(self, turn, actions, world, truck, time):
@@ -24,102 +25,50 @@ class Client(UserClient):
         :param world:       Generic world information
         """
         self.turn += 1
-
         chosen_upgrade = self.select_upgrade(actions, truck)
 
-        
-            # Get active contract
-            # Set fuel sunk costs to 0
-            # Set repair sunk costs to 0
-            print("")
-        elif:
-            # piggyBank = money on hand - (fuel sunk costs + repair sunk costs + 2 * (fuel remaining costs + repair remaining costs))
-        # If there is not an active contract get one
         if(truck.active_contract is None):
-         # Get active contract
-            # Set fuel sunk costs to 0
-            # Set repair sunk costs to 0
-
-        else:
-            # variable to track money for upgrades
-            # piggyBank = truck.money - (fuel sunk costs + repair sunk costs + 2 * ((avg * (fuel remaining)) + repair remaining costs))
-
-            #check if tires are upgraded
-            # if(TireType != "tire_econ" and piggybank >= 300):
-            #     actions.set_action(ActionType.change_tires, TireType.tire_econ)change_tires
-            
-            #upgrades rabbit's foot if the level is less than or equal to the tank level and there is piggybank money for it
-            # Elif(truck.addons.level < 3 and truck.get_cost_of_upgrade(target_addons_upgrade) < piggybank and truck.addons.level <= truck.body.level)
-                #actions.set_action(ActionType.upgrade, ObjectType.rabbitFoot)
-            
-            #upgrades fuel tank if there is piggy bank money for it
-            # Elif(truck.body.level < 3 and truck.get_cost_of_upgrade(target_body_upgrade) < piggybank)
-                #actions.set_action(ActionType.upgrade, ObjectType.tank)
-
-            # checks if gas is necessary
-            # Elif(need gas to survive and truck.money > 0)
-                # actions.set_action(ActionType.buy_gas)
-            
-            #checks if repair is necessary
-            # Elif(if truck.health <= 48 and truck.money > 0)
-                # actions.set_action(ActionType.repair)
-            
-            #drives
-            # Else:
-                # Drive on optimal road
-
-
-
-
-
-        # # If there is not an active contract get one
-        # if(truck.active_contract is None):
-        #     #print("Select")
-        #     chosen_contract = self.select_new_contract(actions, truck)
-        #     actions.set_action(ActionType.select_contract, chosen_contract)
-        # # Buy gas if below 20% and there is enough money to fill tank to full at max gas price
-        # elif(truck.body.current_gas < .20 and truck.money > 100*truck.active_contract.game_map.current_node.gas_price):
-        #     #print("Gas")
-        #     actions.set_action(ActionType.buy_gas)
-        # # If health is below max and have enough money to fully repair do so
-        # elif truck.health < 100 and truck.money > 1000:
-        #     #print("Heal")
-        #     actions.set_action(ActionType.repair)
-        # elif chosen_upgrade is not None:
-        #     #print("Upgrade")
-        #     actions.set_action(ActionType.upgrade, chosen_upgrade)
-        # elif(truck.active_contract.game_map.current_node.next_node is not None):
-        #     # Move to next node
-        #     # Road can be selected by passing the index or road object
-        #     # print("Move:")
-        #     actions.set_action(ActionType.select_route, roads.pop(0))
-
-        # pass
-        print("")
-    # These methods are not necessary, so feel free to modify or replace
+            contract = self.select_new_contract(actions, truck)
+            self.roads = self.generate_roadMap(contract)
+            actions.set_action(ActionType.select_contract, contract)
+        elif truck.speed is not 55:
+            actions.set_action(ActionType.set_speed, 55)
+        elif truck.tires != 1:
+            actions.set_action(ActionType.change_tires, TireType.tire_econ)
+        elif(truck.health < 50):
+            actions.set_action(ActionType.repair)
+        elif(truck.body.current_gas < .20 and truck.money > 100*truck.active_contract.game_map.current_node.gas_price):
+            actions.set_action(ActionType.buy_gas)
+        elif(truck.active_contract.game_map.current_node.next_node is not None):
+            actions.set_action(ActionType.select_route, self.roads.pop(0))
+        pass
     def select_new_contract(self, actions, truck):
-        pay, cost, time, roadmap, expVal = 0, best
+        pay = 0
+        cost = 0
+        time = 0
+        roadmap = None
+        expVal = 0
+        best = None
         for contract in truck.contract_list:
             try:
                 if contract.level == 0:
                     pass
             except AttributeError as e:
-                pass
-            roadmap = self.generate_roadMap(contract)
-            pay = contract.money_reward
-            cost = self.calculate_cost(contract, truck, roadmap) * contract.difficulty
-            time = calculate_time(contract, roadmap)
-            if((pay - cost) / time) > expVal:
-                expVal = (pay - cost) / time
-                best = contract
-        if best != None:
-            return best
+                roadmap = self.generate_roadMap(contract)
+                pay = contract.money_reward
+                cost = self.calculate_cost(contract, truck, roadmap) * contract.difficulty
+                time = self.calculate_time(contract, roadmap)
+                if((pay - cost) / time) > expVal:
+                    expVal = (pay - cost) / time
+                    best = contract
+            if best != None:
+                return best
 
         for contract in truck.contract_list:
             roadmap = self.generate_roadMap(contract)
             pay = contract.money_reward
             cost = self.calculate_cost(contract, truck, roadmap) * contract.difficulty
-            time = calculate_time(contract, roadmap)
+            time = self.calculate_time(contract, roadmap)
             if((pay - cost) / time) > expVal:
                 expVal = (pay - cost) / time
                 best = contract
@@ -128,7 +77,8 @@ class Client(UserClient):
 
     #calculates time to completion
     def calculate_time(self, contract, roadmap):
-        time, temp = contract.game_map.head
+        time = 0
+        temp = contract.game_map.head
         for i in range(len(roadmap)):
             time += self.road_h(temp.roads[roadmap[i]])
             temp = temp.next_node
@@ -136,16 +86,17 @@ class Client(UserClient):
 
     #calculates the cost for a contract
     def calculate_cost(self, contract, truck, roadmap):
-        current_fuel = truck.body.gas, cost = 0
+        current_fuel = truck.body.current_gas
+        cost = 0
+        counter = 0
         temp = contract.game_map.head
         expected_damage = 0.0
         repair_rate_sum = 0.0
-
         for jump in roadmap:
             fuel_used = temp.roads[jump].length / 6.0746
             if (current_fuel - fuel_used <= 0):
                 cost += temp.gas_price*(1-current_fuel)*100
-                current_fuel = truck.max_gas
+                current_fuel = truck.body.max_gas
             current_fuel -= fuel_used
             expected_damage += 15 # adjust this later
             repair_rate_sum = temp.repair_price
@@ -189,10 +140,10 @@ class Client(UserClient):
         return timeToPass + safetyPenalty[r.road_type]
 
     def generate_roadMap(self, contract):
-        temp = contract.game_map.current_node
+        temp = contract.game_map.head
         numNodes = 0
 
-        while(temp is not None):
+        while(temp.next_node is not None):
             numNodes += 1
             temp = temp.next_node
 
