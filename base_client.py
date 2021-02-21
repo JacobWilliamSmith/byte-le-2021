@@ -19,8 +19,16 @@ class Client(UserClient):
     def take_turn(self, turn, actions, world, truck, time):
         self.turn += 1
 
-        chosen_upgrade = self.select_upgrade(actions, truck)
 
+<<<<<<< HEAD
+=======
+        
+        # Get active contract
+        # Set fuel sunk costs to 0
+        # Set repair sunk costs to 0
+        
+        # If there is not an active contract get one
+>>>>>>> ad5d7c5c68c3416c75ba2692a0543f620c0ff12b
         if(truck.active_contract is None):
             chosen_contract = self.select_new_contract(actions, truck)
             actions.set_action(ActionType.select_contract, chosen_contract)
@@ -55,8 +63,8 @@ class Client(UserClient):
             # piggyBank = truck.money - (fuel sunk costs + repair sunk costs + 2 * ((avg * (fuel remaining)) + repair remaining costs))
 
             #check if tires are upgraded
-            # if(TireType != "tire_econ" and piggybank >= 300):
-            #     actions.set_action(ActionType.change_tires, TireType.tire_econ)change_tires
+            # if(bool(TireType.tire_econ) and piggybank >= 300):
+            #     actions.set_action(ActionType.change_tires, TireType.tire_econ)
             
             #upgrades rabbit's foot if the level is less than or equal to the tank level and there is piggybank money for it
             # Elif(truck.addons.level < 3 and truck.get_cost_of_upgrade(target_addons_upgrade) < piggybank and truck.addons.level <= truck.body.level)
@@ -80,6 +88,7 @@ class Client(UserClient):
 
 
 
+<<<<<<< HEAD
 
 
         # # If there is not an active contract get one
@@ -107,6 +116,9 @@ class Client(UserClient):
         # pass
         
 
+=======
+    # These methods are not necessary, so feel free to modify or replace
+>>>>>>> ad5d7c5c68c3416c75ba2692a0543f620c0ff12b
     def select_new_contract(self, actions, truck):
         pay, cost, time, roadmap, expVal = 0, best
         for contract in truck.contract_list:
@@ -170,18 +182,6 @@ class Client(UserClient):
             
 
 
-    # Contract can be selected by passing the index or contract object
-    def select_upgrade(self, actions, truck):
-        target_body_upgrade = ObjectType.tank
-        target_addons_upgrade = ObjectType.rabbitFoot
-        if truck.body.level < 3 and truck.get_cost_of_upgrade(target_body_upgrade) < truck.money:
-            chosen_upgrade = target_body_upgrade
-        elif truck.addons.level < 3 and truck.get_cost_of_upgrade(target_addons_upgrade) < truck.money:
-            chosen_upgrade = target_addons_upgrade
-        else:
-            chosen_upgrade = None
-        return chosen_upgrade
-    
     # Road can be selected by passing the index or road object
     def select_new_route(self, actions, truck):
         roads = truck.active_contract.game_map.current_node.roads
